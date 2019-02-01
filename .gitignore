@@ -1,0 +1,8 @@
+# 以下文件可被 git 忽略
+
+.vscode/settings.json
+build/
+devel/
+protobuf/
+build_isolated/
+devel_isolated/
