@@ -29,8 +29,8 @@
 ```bash
 # 下载代码，安装protobuf
 $ git clone git@github.com:NOT-old-wang/carto_ws.git
-$ git submodule update --init --recursive
 $ cd carto_ws
+$ git submodule update --init --recursive
 $ sudo apt-get update
 $ sudo apt-get install -y python-wstool python-rosdep ninja-build
 $ src/cartographer/scripts/install_proto3.sh
