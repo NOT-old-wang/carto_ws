@@ -1,4 +1,4 @@
-# google 开源的 cartographer 学习版本代码
+# google 开源的 cartographer 学习版本
 
 ## 运行环境
 `Ubuntu 16.04 ros-kinetic`
