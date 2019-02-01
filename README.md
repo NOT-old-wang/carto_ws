@@ -23,6 +23,7 @@
 由于网络、依赖、重复安装等原因，官方编译会出问题;
 可按照以下步骤
 ```bash
+# 下载代码，安装protobuf
 $ git clone git@github.com:NOT-old-wang/carto_ws.git
 $ cd carto_ws
 $ sudo apt-get update
@@ -36,4 +37,9 @@ $ rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
 
 # 编译 build
 $ catkin_make_isolated --use-ninja
+```
+如果编译失败，用`find`命令找到编译失败的相关文件(源码除外),，删除，重新编译即可。
+```
+# `find`命令 示例
+$ sudo find / -name "*ceres*" 
 ```
