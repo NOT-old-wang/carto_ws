@@ -29,7 +29,7 @@ $ sudo apt-get update
 $ sudo apt-get install -y python-wstool python-rosdep ninja-build
 $ src/cartographer/scripts/install_proto3.sh
 
-# 以下三步报错可不理会
+# 以下三步如果报错 可不理会
 $ sudo rosdep init
 $ rosdep update
 $ rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
