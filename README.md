@@ -15,13 +15,17 @@
 
 ## 项目说明
 
-目前 `cartographer`、`cartographer_ros`、`ceres-solver`都为google远程分支上最新代码，部分注释为自己添加;
+目前 `cartographer`、`cartographer_ros`、`ceres-solver`都为google远程分支上最新代码，部分注释为自己添加。
+
 `my_robot`为学习用的节点。
 
 ## 编译说明
-[官方参考](https://google-cartographer-ros.readthedocs.io/en/latest/compilation.html)
+- [官方参考](https://google-cartographer-ros.readthedocs.io/en/latest/compilation.html)
+
 由于网络、依赖、重复安装等原因，官方编译会出问题;
-可按照以下步骤
+
+可按照以下步骤：
+
 ```bash
 # 下载代码，安装protobuf
 $ git clone git@github.com:NOT-old-wang/carto_ws.git
