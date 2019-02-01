@@ -1,6 +1,6 @@
 # 以下文件可被 git 忽略
 
-.vscode/settings.json
+src/.vscode/
 build/
 devel/
 protobuf/
