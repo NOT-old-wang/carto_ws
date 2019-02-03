@@ -49,4 +49,17 @@ $ catkin_make_isolated --use-ninja
 $ sudo find / -name "*ceres*" 
 ```
 ## my_robot 节点说明
-
+```
+--- my_robot
+ |- configuration_ros
+ |- launch
+ └- urdf
+```
+- 建图
+```bash
+$ roslaunch my_robot mapping.launch bag_filename:= "自己录的数据包绝对地址"
+```
+- 定位
+```bash
+$ roslaunch my_robot localizer.launch
+```
