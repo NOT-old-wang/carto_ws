@@ -28,7 +28,7 @@
 
 ```bash
 # 下载代码
-$ git clone git@github.com:NOT-old-wang/carto_ws.git
+$ git clone https://github.com/NOT-old-wang/carto_ws.git
 $ cd carto_ws
 # 下载代码下子模块 -- cartographer cartographer_ros ceres-solver 三个仓库
 $ git submodule update --init --recursive
