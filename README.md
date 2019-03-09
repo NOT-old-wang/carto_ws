@@ -27,12 +27,14 @@
 可按照以下步骤：
 
 ```bash
-# 下载代码，安装protobuf
+# 下载代码
 $ git clone git@github.com:NOT-old-wang/carto_ws.git
 $ cd carto_ws
+# 下载代码下子模块 -- cartographer cartographer_ros ceres-solver 三个仓库
 $ git submodule update --init --recursive
 $ sudo apt-get update
 $ sudo apt-get install -y python-wstool python-rosdep ninja-build
+# 安装protobuf
 $ src/cartographer/scripts/install_proto3.sh
 
 # 以下三步如果报错 可不理会
