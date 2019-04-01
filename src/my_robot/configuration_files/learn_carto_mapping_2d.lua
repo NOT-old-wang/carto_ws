@@ -41,7 +41,7 @@ TRAJECTORY_BUILDER_2D.use_imu_data = false
 
 return options
 
--- lua 配置中都是已米和秒为单位
+-- lua 配置中都是已 米 和 秒 为单位
 -- options块中定义的值定义了Cartographer ROS前端应如何与您的包进行交互。options段落后定义的值用于调整Cartographer的内部工作
 -- 你的环境和机器人的TF帧ID中
 
@@ -79,8 +79,13 @@ return options
 -- MAP_BUILDER.use_trajectory_builder_2d = true  2D slam
 -- MAP_BUILDER.num_background_threads = 8        核数
 
+-- 开启 imu 用作扫描方向的初始猜测，大大降低了扫描匹配的复杂性 3D必须
+-- TRAJECTORY_BUILDER_2D.use_imu_data
+-- TRAJECTORY_BUILDER_nD.imu_gravity_time_constant
+
 -- 子图尺寸 <-- node 的个数  
--- TRAJECTORY_BUILDER_2D.submaps.num_range_data = 80
+-- TRAJECTORY_BUILDER_2D.submaps.num_range_data = 80 
+
 -- 带通滤波器
 -- TRAJECTORY_BUILDER_2D.min_range= 1.
 -- TRAJECTORY_BUILDER_2D.max_range = 25.
@@ -88,27 +93,46 @@ return options
 -- TRAJECTORY_BUILDER_3D.num_accumulated_range_data
 -- TRAJECTORY_BUILDER_2D.use_imu_data = false
 
--- 里程等传感器不准确 开启它进行预估 精 有三部分
+-- 自适应体素滤波 votex filter [先前有一次固定的体素滤波]
+-- 较小的立方体大小将导致更密集的数据,较大的立方体大小会导致数据丢失，但会更快
+-- TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.max_length = 0.2
+-- TRAJECTORY_BUILDER_2D.adaptive_voxel_filter.min_num_points = 400
+
+-- 运动滤波器 motion filter [根据 距离,角度,时间]    
+-- TRAJECTORY_BUILDER_2D.motion_filter.max_distance_meters = 1.5
+-- TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(9.)
+-- TRAJECTORY_BUILDER_2D.motion_filter.max_time_seconds = 7.
+
+-- 两种扫描匹配策略
+-- 1
+-- 取初始猜测事先并发现其中扫描匹配适合的子地图的最佳点,通过插入子图和子像素对齐扫描来实现
+-- 无法修复明显大于子图分辨率的错误
+-- 传感器设置和时间是合理的，那么仅使用CeresScanMatcher它通常是最佳选择
+-- TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 0.1
+-- TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 0.1
+-- TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 20
+-- Ceres使用下降算法针对给定的迭代次数优化运动。Ceres可以配置为根据您自己的需要调整收敛速度
+-- TRAJECTORY_BUILDER_nD.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_steps
+-- TRAJECTORY_BUILDER_nD.ceres_scan_matcher.ceres_solver_options.max_num_iterations
+-- TRAJECTORY_BUILDER_nD.ceres_scan_matcher.ceres_solver_options.num_threads
+
+-- 2
+-- 
+-- 有其他传感器或者您不信任它们，则可以启用
 -- TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true 
 -- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.05
 -- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 20.
 -- TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
 
--- TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 0.1
--- TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 0.1
--- TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 20
-
 -- 子图插入概率的更新
 -- TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.hit_probability = 0.62   加快
 -- TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.miss_probability = 0.47  0,1是障碍物
 
--- 更新node的条件
--- TRAJECTORY_BUILDER_2D.motion_filter.max_distance_meters = 1.5
--- TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(9.)
--- TRAJECTORY_BUILDER_2D.motion_filter.max_time_seconds = 7.
-
 -- 关闭全局SLAM：0 
 -- POSE_GRAPH.optimize_every_n_nodes = 0
+
+-- 获得格式化为直方图的约束构建器的常规报告
+-- POSE_GRAPH.constraint_builder.log_matches
 
 -- 调整局部SLAM和里程计的各个权重
 -- POSE_GRAPH.optimization_problem.local_slam_pose_translation_weight
@@ -116,10 +140,19 @@ return options
 -- POSE_GRAPH.optimization_problem.odometry_translation_weight
 -- POSE_GRAPH.optimization_problem.odometry_rotation_weight
 
+-- 限制约束（和计算）的数量
 -- POSE_GRAPH.constraint_builder.sampling_ratio      对应于约束的数量上限
 -- POSE_GRAPH.min_score = 0.60                       成为约束的最低分数,值越大，计算速度相对越快，约束数量相对越少
--- POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.angular_search_window=math.rad(20.)    对应于闭环检测（约束检测）时的搜索范围
-
 -- 备注：上述各参数调整核心是闭环检测（约束检测），
 -- 闭环检测是图优化过程中最为重要的部分，也是最为耗时的部分，
 -- 因此减少约束总数和搜索范围可以有效提高实时性
+
+-- 实现实时循环闭合扫描匹配
+-- FastCorrelativeScanMatcher 依靠“ 分支定界 ”机制在不同的格点分辨率的工作，有效地消除不正确匹配数
+-- POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.branch_and_bound_depth
+-- POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher_3d.branch_and_bound_depth
+-- POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher_3d.full_resolution_depth
+-- POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.angular_search_window=math.rad(20.)    对应于闭环检测（约束检测）时的搜索范围
+
+-- 迭代次数
+-- POSE_GRAPH.max_num_final_iterations
