@@ -46,8 +46,8 @@ return options
 -- 你的环境和机器人的TF帧ID中
 
 -- 坐标系
--- map_frame = "map"                父坐标系
--- tracking_frame = "base_link"     跟踪坐标系 
+-- map_frame = "map"                全局坐标系
+-- tracking_frame = "base_link"     机器人中新坐标系 
 -- published_frame = "base_link"    发布坐标系
 -- odom_frame = "odom"              用于发布（非循环关闭）本地SLAM结果
 
