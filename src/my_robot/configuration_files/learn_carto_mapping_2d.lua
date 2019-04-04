@@ -52,12 +52,13 @@ return options
 -- odom_frame = "odom"              用于发布（非循环关闭）本地SLAM结果
 
 -- 启用传感器或功能
--- provide_odom_frame = true        如果启用，则本地非闭环连续姿势将作为map_frame中的odom_frame发布
 -- use_pose_extrapolator            默认为true
--- publish_frame_projected_to_2d = fasle  如果启用，则已发布的姿势将限制为纯2D姿势（无滚动，俯仰或z偏移/amo
+
+-- provide_odom_frame = true        如果启用，则本地非闭环连续姿势将作为map_frame中的odom_frame发布
 -- use_odometry = false             如果启用，请在主题“ odom ”上订阅nav_msgs / Odometry
--- use_landmarks
 -- use_nav_sat
+-- use_landmarks
+-- publish_frame_projected_to_2d = fasle  如果启用，则已发布的姿势将限制为纯2D姿势（无滚动，俯仰或z偏移/amo
 -- num_laser_scans：                sensor_msgs/LaserScan  雷达  /scan 的个数,多个如"scan_1" ,"scan_2"...
 -- num_multi_echo_laser_scans：     sensor_msgs/MultiEchoLaserScan 回波雷达,多个激光，topics为“echoes_1”, “echoes_2”...
 -- num_subdivisions_per_laser_scan 
