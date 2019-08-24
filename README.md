@@ -6,7 +6,6 @@
 ## 项目结构
 ```
 --- src
- |- .vscode
  |- cartographer
  |- cartographer_ros
  |- ceres-solver
@@ -46,12 +45,13 @@ $ rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
 $ catkin_make_isolated --use-ninja
 ```
 如果编译失败，用`find`命令找到编译失败的相关文件(源码除外)删除，重新编译即可。
-```
+```bash
 # find 命令示例
 $ sudo find / -name "*ceres*" 
 ```
 ## my_robot 节点说明
 ```
+# 自己的机器人节点，有部分学习资料
 --- my_robot
  |- configuration_ros
  |- launch

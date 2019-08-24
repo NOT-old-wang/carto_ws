@@ -1,6 +1,7 @@
 # 以下文件可被 git 忽略
 
 .vscode
+.catkin_workspace
 build/
 devel/
 protobuf/
