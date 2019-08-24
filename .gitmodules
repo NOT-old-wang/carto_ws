@@ -6,4 +6,4 @@
 	url = https://github.com/googlecartographer/cartographer_ros.git
 [submodule "src/ceres-solver"]
 	path = src/ceres-solver
-	url = https://github.com/googlecartographer/cartographer_ros.git
+	url = https://github.com/ceres-solver/ceres-solver.git
