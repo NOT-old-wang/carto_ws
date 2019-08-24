@@ -1,9 +1,9 @@
 [submodule "src/cartographer"]
 	path = src/cartographer
-	url = git@github.com:googlecartographer/cartographer.git
+	url = https://github.com/googlecartographer/cartographer.git
 [submodule "src/cartographer_ros"]
 	path = src/cartographer_ros
-	url = git@github.com:googlecartographer/cartographer_ros.git
+	url = https://github.com/googlecartographer/cartographer_ros.git
 [submodule "src/ceres-solver"]
 	path = src/ceres-solver
-	url = git@github.com:ceres-solver/ceres-solver.git
+	url = https://github.com/googlecartographer/cartographer_ros.git
