@@ -37,7 +37,7 @@ MAP_BUILDER.num_background_threads = 8  -- 核数
 
 -- 开启 imu 用作扫描方向的初始猜测，大大降低了扫描匹配的复杂性 3D必须
 TRAJECTORY_BUILDER_2D.use_imu_data = false
-TRAJECTORY_BUILDER_nD.imu_gravity_time_constant = 10
+TRAJECTORY_BUILDER_2D.imu_gravity_time_constant = 10
 
 -- 带通滤波器 雷达测距数据的可用范围
 TRAJECTORY_BUILDER_2D.min_range= 1. 
@@ -65,6 +65,7 @@ TRAJECTORY_BUILDER_2D.loop_closure_adaptive_voxel_filter.max_range = 50.
 -- real time correlative
 -- 没有其他传感器或者您不信任它们，则可以启用，这种扫描匹配器非常昂贵，并且基本上会覆盖来自其他传感器但除了测距仪的任何信号，但它在功能丰富的环境中非常强大。
 -- 它使用的方法类似于在循环闭包中将扫描与子图匹配的方式，但它与当前子图匹配。然后将最佳匹配用作之前的CeresScanMatcher。
+-- 工作原理是在搜索窗口中搜索类似的扫描，搜索窗口由最大距离半径和最大角度半径定义
 TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true 
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.05
 TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.angular_search_window = math.rad(20.)
@@ -88,8 +89,6 @@ TRAJECTORY_BUILDER_2D.motion_filter.max_time_seconds = 7.
 TRAJECTORY_BUILDER_2D.motion_filter.max_distance_meters = 1.5
 TRAJECTORY_BUILDER_2D.motion_filter.max_angle_radians = math.rad(9.)
 
-TRAJECTORY_BUILDER_2D.imu_gravity_time_constant = 10.
-
 -- 子图配置  
 TRAJECTORY_BUILDER_2D.submaps.num_range_data = 150  -- 子图尺寸: node 的个数
 TRAJECTORY_BUILDER_2D.submaps.grid_options_2d.grid_options_2d = "PROBABILITY_GRID"
@@ -99,7 +98,7 @@ TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.range_data_inserter_type = "PR
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.insert_free_space = true   
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.hit_probability = 0.62
 TRAJECTORY_BUILDER_2D.submaps.range_data_inserter.probability_grid_range_data_inserter.miss_probability = 0.47
--- TODO:(other options)
+-- TODO:(other submap options)
 
 -- 关闭全局SLAM：0
 POSE_GRAPH.optimize_every_n_nodes = 0
@@ -107,7 +106,7 @@ POSE_GRAPH.optimize_every_n_nodes = 0
 -- 限制约束（和计算）的数量, 参数调整核心是闭环检测（约束检测）
 -- 闭环检测是图优化过程中最为重要的部分，也是最为耗时的部分，
 -- 因此减少约束总数和搜索范围可以有效提高实时性
-POSE_GRAPH.constraint_builder.sampling_ratio = 0.3
+POSE_GRAPH.constraint_builder.sampling_ratio = 0.3  -- 采样少的节点不进入计算
 POSE_GRAPH.constraint_builder.max_constraint_distance = 15.
 POSE_GRAPH.constraint_builder.min_score = 0.55  -- 成为约束的最低分数,值越大，计算速度相对越快，约束数量相对越少
 POSE_GRAPH.constraint_builder.global_localization_min_score = 0.6
@@ -116,11 +115,14 @@ POSE_GRAPH.constraint_builder.loop_closure_rotation_weight = 1e5
 POSE_GRAPH.constraint_builder.log_matches = true  -- 获得格式化为直方图的约束构建器的常规报告
 -- 实现实时循环闭合扫描匹配策略: fast correlative scan matcher
 -- FastCorrelativeScanMatcher 依靠“ 分支定界 ”机制在不同的格点分辨率的工作，有效地消除不正确匹配数
--- TODO: 对应于闭环检测（约束检测）时的搜索范围
+-- TODO: 对应于闭环检测（约束检测）时的搜索范围，可控制深度的搜索树
 POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.linear_search_window = 7.
 POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.angular_search_window = math.rad(30.)
 POSE_GRAPH.constraint_builder.fast_correlative_scan_matcher.branch_and_bound_depth = 7
--- TODO:
+-- TODO: fast correlative scan matcher 匹配完后(分数高于最低分数)，输入ceres扫描匹配器用于改进位姿
+-- Ceres用于根据多个残差重新排列子图
+-- 残差是使用加权损失函数计算的
+-- 全局优化具有成本函数以考虑大量数据源：全局（循环闭包）约束，非全局（匹配器）约束，IMU加速和旋转测量，局部SLAM粗略姿态估计，测距源或固定框架（如GPS系统）
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.occupied_space_weight = 20.
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.translation_weight = 10.
 POSE_GRAPH.constraint_builder.ceres_scan_matcher.rotation_weight = 1.
