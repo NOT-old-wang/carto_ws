@@ -3,6 +3,7 @@
 ```
 node_main.cc
 
+FLAG_xxx
 环境变量标志 源码在/usr/include/"gflags/gflags.h" 定义一系列的宏
 可以在代码中更改，也可以在`launch`文件中给定
 ```
@@ -50,8 +51,7 @@ ros::time 和 `cartographer` 的 time 数据结构的互相转化
   
   输入 tracking_frame、lookup_transform_timeout_sec、tf2_ros::Buffer
   
-  调用 msg_conversion 中的 ToRigid3d(buffer_->lookupTransform(tracking_frame_, frame_id,
-                                                             requested_time, timeout)))
+  调用 msg_conversion 中的 ToRigid3d(buffer_->lookupTransform(tracking_frame_, frame_id, requested_time, timeout)))
   输出 unique_ptr<::cartographer::transform::Rigid3d>
   
   ```
