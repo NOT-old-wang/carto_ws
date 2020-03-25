@@ -19,3 +19,31 @@ google cartographer 学习和参数配置
   2: Odometry
   3: Imu
 - fixed frame Pose [和 Local的result 用来做全局优化]
+
+## cartographr_ros
+- Node类: 交互的主类, 主要包括
+```
+1.Ros相关: (NodeHandle, Publisher, Subscriber, ServiceServer, tf2_ros::TransformBroadcaster, WallTimer, Timer)
+2.构图核心类: MapBuilderBridge (cartographer::mapping::MapBuilderInterface的代理)
+3.位姿外推器: cartographer::mapping::PoseExtrapolator
+4.采样器: cartographer::common::FixedRatioSampler
+```
+- 主要方法
+```cpp
+// 输入数据(1: 外推器, 2: 传感数据数据采样 3: ros回调函数订阅数据)
+int AddTrajectory(const TrajectoryOptions& options,
+                  const cartographer_ros_msgs::SensorTopics& topics);
+
+// 发出位置 tf
+void PublishLocalTrajectoryData(const ::ros::TimerEvent& timer_event);
+```
+
+## cartographr
+- mapping: 核心模块, 做构建地图相关的操作,约束,优化,scan_match,2D,3D模块,位姿外推器, 主要的类为 `MapBuilder`
+- sensor: 传感器相关操作, 传感器数据的转化,数据的预处理(体素滤波器)
+- transform: 机器人位姿坐标相关, 地图旋转平移等操作
+- common: 1:lua配置文件解算 2:线程池 3:采样器 4:时间相关 5:线程安全的相关队列(阻塞等) 6:直方图打印 7:ceres解算器配置 8:类型映射 port
+- pose_graph: 图优化相关
+- cloud: 
+- io: 
+- TODO
