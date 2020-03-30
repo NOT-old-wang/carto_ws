@@ -24,7 +24,7 @@ google cartographer 学习和参数配置
 - Node类: 交互的主类, 主要包括
 ```
 1.Ros相关: (NodeHandle, Publisher, Subscriber, ServiceServer, tf2_ros::TransformBroadcaster, WallTimer, Timer)
-2.构图核心类: MapBuilderBridge (cartographer::mapping::MapBuilderInterface的代理)
+2.构图核心类: MapBuilderBridge (cartographer::mapping::MapBuilderInterface的代理类)
 3.位姿外推器: cartographer::mapping::PoseExtrapolator
 4.采样器: cartographer::common::FixedRatioSampler
 ```
@@ -47,3 +47,53 @@ void PublishLocalTrajectoryData(const ::ros::TimerEvent& timer_event);
 - cloud: 
 - io: 
 - TODO
+
+
+## 位姿外推器: cartographer::mapping::PoseExtrapolator
+- 作用: 使用运动估计 pose, 使用出了距离传感器之外的其它传感器数据来预测下一个扫描数据应该插入到子地图的什么地方
+```
+根据位姿pose 推出线速度和角速度
+根据里程odom 推出线速度和角速度
+```
+- 输入
+```
+1: 带时间的位姿: common::Time time, const transform::Rigid3d& pose
+2: IMU数据: const sensor::ImuData& imu_data
+3: 里程的数据: const sensor::OdometryData& odometry_data
+```
+- 输出
+```
+1: 最后一次位置的时间: common::Time GetLastPoseTime()
+2: common::Time GetLastExtrapolatedTime()
+3: Eigen::Quaterniond EstimateGravityOrientation(common::Time time)
+```
+
+## 采样器: 
+- 作用: 从数据流中均匀的按照固定频率采样数据
+```
+输入采样率 rate, 使用 Pulse()
+rate : 0 ~ 1
+例: rate == 0.5, 每两桢数据提取一桢
+```
+
+## 关于时间
+- cartographer_ros 中 time_conversion.cc
+```cpp
+// 将 ros 时间转化为 carto 内部时间, 例: 把传感器时间戳的时间转化为内部时间
+::cartographer::common::Time FromRos(const ::ros::Time& time) 
+
+// 将 carto 内部时间 转化为 ros时间
+::ros::Time ToRos(::cartographer::common::Time time)
+```
+
+- cartographer common 中 time.cc
+```cpp
+// TODO
+```
+
+## 关于传感器数据
+cartographer sensor 里面定义了一系列传感器的数据格式
+```
+1. point_cloud: 点云相关数据
+2. 
+```
