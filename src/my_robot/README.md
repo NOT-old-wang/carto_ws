@@ -52,6 +52,8 @@ void PublishLocalTrajectoryData(const ::ros::TimerEvent& timer_event);
 ## 位姿外推器: cartographer::mapping::PoseExtrapolator
 - 作用: 使用运动估计 pose, 使用出了距离传感器之外的其它传感器数据来预测下一个扫描数据应该插入到子地图的什么地方
 ```
+解决了IMU数据、里程计和位姿信息进行融合的问题
+通过 TrimImuData，TrimOdometryData 确保使用的是当前位置后的传感器数据
 根据位姿pose 推出线速度和角速度
 根据里程odom 推出线速度和角速度
 ```
@@ -65,7 +67,16 @@ void PublishLocalTrajectoryData(const ::ros::TimerEvent& timer_event);
 ```
 1: 最后一次位置的时间: common::Time GetLastPoseTime()
 2: common::Time GetLastExtrapolatedTime()
-3: Eigen::Quaterniond EstimateGravityOrientation(common::Time time)
+3: 最主要: ExtrapolatePose(common::Time time) 推测某一时刻的位姿的时候，调用了 ExtrapolateTranslation 和 ExtrapolateRotation 方法
+4: Eigen::Quaterniond EstimateGravityOrientation(common::Time time)
+```
+- imu_tracker
+```
+通过陀螺仪的积分可以得到旋转角度, 然后通过加速度计的比例和积分运算来修正陀螺仪的积分结果
+1: 通过积分得到姿态用四元数表示
+2: 根据姿态得到各个重力分量
+3: 加速度测量的各个重力方向与估算的进行融合, 这里采用滑动平均
+4: 修正姿态
 ```
 
 ## 采样器: 
