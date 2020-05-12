@@ -45,7 +45,7 @@ TRAJECTORY_BUILDER_2D.max_range = 25.
 TRAJECTORY_BUILDER_2D.min_z = -0.8
 TRAJECTORY_BUILDER_2D.max_z = 2
 TRAJECTORY_BUILDER_2D.missing_data_ray_length = 25.
-TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 1
+TRAJECTORY_BUILDER_2D.num_accumulated_range_data = 1  -- 点云缓存到一定数目 scan 后插入 submap
 
 -- 固定的体素滤波 原始点下采样为一个恒定大小的立方体，并只保留每个立方体的质心
 -- 较小的立方体大小将导致更密集的数据,较大的立方体大小会导致数据丢失，但会更快
