@@ -76,9 +76,9 @@ TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_wei
 -- 取初始猜测事先并发现其中扫描匹配适合的子地图的最佳点,通过插入子图和子像素对齐扫描来实现
 -- 无法修复明显大于子图分辨率的错误
 -- 传感器设置和时间是合理的，那么仅使用CeresScanMatcher它通常是最佳选择
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 0.1
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 0.1
-TRAJECTORY_BUILDER_2D.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 20
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.occupied_space_weight = 1.
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.translation_weight = 10
+TRAJECTORY_BUILDER_2D.ceres_scan_matcher.rotation_weight = 40
 -- Ceres使用下降算法针对给定的迭代次数优化运动。Ceres可以配置为根据您自己的需要调整收敛速度
 TRAJECTORY_BUILDER_nD.ceres_scan_matcher.ceres_solver_options.use_nonmonotonic_steps = false
 TRAJECTORY_BUILDER_nD.ceres_scan_matcher.ceres_solver_options.max_num_iterations = 20
